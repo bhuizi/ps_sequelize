@@ -9,10 +9,6 @@ const connection = new Sequelize('db', 'user', 'pass', {
     dialect: 'sqlite',
     storage: 'db.sqlite',
     operatorAliases: false,
-    define: {
-        freezeTableName: true
-    }
-
 });
 
 const User = connection.define('User', {
@@ -21,39 +17,27 @@ const User = connection.define('User', {
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4
     },
-    name: {
-        type: Sequelize.STRING,
-        validate: {
-            len: [3]
-        }
-    },
-    bio: {
-        type: Sequelize.STRING,
-        validate: {
-            contains: {
-                args: ['foo'],
-                msg: 'Error: Field must contain foo'
-            }
+    first: Sequelize.STRING,
+    last: Sequelize.STRING,
+    full_name: Sequelize.STRING,
+    bio: Sequelize.STRING
+}, {
+    hooks: {
+        beforeValidate: () => {
+            console.log('before validate');
+        },
+        afterValidate: () => {
+            console.log('after validate');
+        },
+        beforeCreate: (user) => {
+            user.full_name = `${user.first} ${user.last}`
+            console.log('before create');
+        },
+        afterCreate: () => {
+            console.log('after create');
         }
     }
-}, {
-    timestamps: false
 });
-
-// example for throwing validation errors
-// app.get('/', (req, res) => {
-//     User.create({
-//         name: 'jo',
-//         bio: 'new bio entry'
-//     })
-//     .then(user => {
-//         res.json(user);
-//     })
-//     .catch(e => {
-//         console.log(e);
-//         res.status(404).send(e);
-//     })
-// });
 
 connection
     .sync({
@@ -62,7 +46,8 @@ connection
     })
     .then(() => {
         User.create({
-            name: 'joe',
+            first: 'joe',
+            last: 'smith',
             bio: 'new bio entry: foo'
         })
     })

@@ -8,7 +8,11 @@ const connection = new Sequelize('db', 'user', 'pass', {
     host: 'localhost',
     dialect: 'sqlite',
     storage: 'db.sqlite',
-    operatorAliases: false
+    operatorAliases: false,
+    define: {
+        freezeTableName: true
+    }
+
 });
 
 const User = connection.define('User', {
@@ -17,9 +21,39 @@ const User = connection.define('User', {
         primaryKey: true,
         defaultValue: Sequelize.UUIDV4
     },
-    name: Sequelize.STRING,
-    bio: Sequelize.STRING
+    name: {
+        type: Sequelize.STRING,
+        validate: {
+            len: [3]
+        }
+    },
+    bio: {
+        type: Sequelize.STRING,
+        validate: {
+            contains: {
+                args: ['foo'],
+                msg: 'Error: Field must contain foo'
+            }
+        }
+    }
+}, {
+    timestamps: false
 });
+
+// example for throwing validation errors
+// app.get('/', (req, res) => {
+//     User.create({
+//         name: 'jo',
+//         bio: 'new bio entry'
+//     })
+//     .then(user => {
+//         res.json(user);
+//     })
+//     .catch(e => {
+//         console.log(e);
+//         res.status(404).send(e);
+//     })
+// });
 
 connection
     .sync({
@@ -29,7 +63,7 @@ connection
     .then(() => {
         User.create({
             name: 'joe',
-            bio: 'new bio entry'
+            bio: 'new bio entry: foo'
         })
     })
     .then(() => {

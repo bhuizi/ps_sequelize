@@ -71,6 +71,19 @@ app.put('/update', (req, res) => {
       })
 })
 
+app.delete('/remove', (req, res) => {
+    User.destroy({
+        where: {id: 50}
+    })
+      .then(() => {
+          res.send('User successfully deleted');
+      })
+      .catch(error => {
+          console.log(error);
+          res.status(404).send(error);
+      })
+})
+
 connection
     .sync()
     .then(() => {

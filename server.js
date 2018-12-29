@@ -57,6 +57,20 @@ app.get('/findone', (req, res) => {
       })
 });
 
+app.put('/update', (req, res) => {
+    User.update({
+        name: 'Axl Rose',
+        password: 'password'
+    }, {where: {id: 55}})
+      .then(rows => {
+          res.send(rows);
+      })
+      .catch(error => {
+          console.log(rows);
+          res.status(404).send(error);
+      })
+})
+
 connection
     .sync()
     .then(() => {

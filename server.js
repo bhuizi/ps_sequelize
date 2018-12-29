@@ -28,17 +28,19 @@ const User = connection.define('User', {
     }
 });
 
+app.get('/findall', (req, res) => {
+    User.findAll()
+      .then(users => {
+          res.json(users)
+      })
+      .catch(error => {
+          console.log(error)
+          res.status(404).send(error);
+      });
+});
+
 connection
     .sync()
-    .then(() => {
-        User.bulkCreate(_USERS)
-          .then(users => {
-            console.log('Success adding users');
-          })
-          .catch(e => {
-              console.log(e);
-          })
-    })
     .then(() => {
         console.log('Connection to database established successully.')
     })

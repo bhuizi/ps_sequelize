@@ -1,5 +1,6 @@
 const express = require('express');
 const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const _USERS = require('./users.json');
 
 const app = express();
@@ -29,7 +30,13 @@ const User = connection.define('User', {
 });
 
 app.get('/findall', (req, res) => {
-    User.findAll()
+    User.findAll({
+        where: {
+          name: {
+              [Op.like]: 'Ame%'
+          }
+        }
+    })
       .then(users => {
           res.json(users)
       })

@@ -46,6 +46,17 @@ app.get('/findall', (req, res) => {
       });
 });
 
+app.get('/findone', (req, res) => {
+    User.findById('55')
+      .then(user => {
+          res.json(user);
+      })
+      .catch(error => {
+          console.log(error);
+          res.status(404).send(error);
+      })
+});
+
 connection
     .sync()
     .then(() => {

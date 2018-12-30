@@ -41,7 +41,9 @@ const Post = connection.define('Post', {
 
 app.get('/allposts', (req, res) => {
     Post.findAll({
-        include: [User]
+        include: [{
+            model: User, as: 'UserRef'
+        }]
     })
       .then(posts => {
           res.json(posts)
@@ -52,19 +54,12 @@ app.get('/allposts', (req, res) => {
       });
 });
 
-Post.belongsTo(User, {foreignKey: 'userId'});
+Post.belongsTo(User, {as: 'UserRef', foreignKey: 'userId'});
 
 connection
     .sync({
         force: true
     })
-    // .then(() => {
-    //     Post.create({
-    //         UserId: 1,
-    //         title: 'First post',
-    //         content: 'post content 1'
-    //     })
-    // })
     .then(() => {
         User.bulkCreate(_USERS)
           .then(users => {
@@ -73,6 +68,13 @@ connection
           .catch(error => {
               console.log('Upable to add users', error);
           })
+    })
+    .then(() => {
+        Post.create({
+            userId: 1,
+            title: 'First post',
+            content: 'post content 1'
+        })
     })
     .then(() => {
         console.log('Connection to database established successully.')

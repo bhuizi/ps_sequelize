@@ -29,16 +29,22 @@ const User = connection.define('User', {
     }
 });
 
-app.get('/findall', (req, res) => {
-    User.findAll({
-        where: {
-          name: {
-              [Op.like]: 'Ame%'
-          }
-        }
+const Post = connection.define('Post', {
+    id: {
+        primaryKey: true,
+        type: Sequelize.STRING,
+        defaultValue: Sequelize.UUIDV4
+    },
+    title: Sequelize.STRING,
+    content: Sequelize.TEXT
+});
+
+app.get('/allposts', (req, res) => {
+    Post.findAll({
+        include: [User]
     })
-      .then(users => {
-          res.json(users)
+      .then(posts => {
+          res.json(posts)
       })
       .catch(error => {
           console.log(error)
@@ -46,46 +52,17 @@ app.get('/findall', (req, res) => {
       });
 });
 
-app.get('/findone', (req, res) => {
-    User.findById('55')
-      .then(user => {
-          res.json(user);
-      })
-      .catch(error => {
-          console.log(error);
-          res.status(404).send(error);
-      })
-});
-
-app.put('/update', (req, res) => {
-    User.update({
-        name: 'Axl Rose',
-        password: 'password'
-    }, {where: {id: 55}})
-      .then(rows => {
-          res.send(rows);
-      })
-      .catch(error => {
-          console.log(rows);
-          res.status(404).send(error);
-      })
-})
-
-app.delete('/remove', (req, res) => {
-    User.destroy({
-        where: {id: 50}
-    })
-      .then(() => {
-          res.send('User successfully deleted');
-      })
-      .catch(error => {
-          console.log(error);
-          res.status(404).send(error);
-      })
-})
+Post.belongsTo(User); // puts forgeinKey userId in Post table
 
 connection
     .sync()
+    .then(() => {
+        Post.create({
+            UserId: 1,
+            title: 'First post',
+            content: 'post content 1'
+        })
+    })
     .then(() => {
         console.log('Connection to database established successully.')
     })

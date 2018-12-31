@@ -30,13 +30,16 @@ const User = connection.define('User', {
 });
 
 const Post = connection.define('Post', {
-    id: {
-        primaryKey: true,
-        type: Sequelize.STRING,
-        defaultValue: Sequelize.UUIDV4
-    },
     title: Sequelize.STRING,
     content: Sequelize.TEXT
+});
+
+const Comment = connection.define('Comment', {
+    the_comment: Sequelize.STRING
+});
+
+const Project = connection.define('Project', {
+    title: Sequelize.STRING
 });
 
 app.get('/allposts', (req, res) => {
@@ -54,7 +57,61 @@ app.get('/allposts', (req, res) => {
       });
 });
 
+app.get('/singlepost', (req, res) => {
+    Post.findById('1', {
+        include: [{
+            model: Comment, as: 'All_Comments',
+            attributes: ['the_comment']
+        },{
+            model: User, as: 'UserRef'
+        }
+    ]
+    })
+      .then(post => {
+          res.json(post)
+      })
+      .catch(error => {
+          console.log(error)
+          res.status(404).send(error);
+      });
+});
+
+app.get('/userprojects', (req, res) => {
+    User.findAll({
+        attributes: ['name'],
+        include: [{
+            model: Project, as: 'Tasks',
+            attributes: ['title']
+        }]
+    })
+    .then(output => {
+        res.send(output);
+    })
+    .catch(error => {
+        console.log(error);
+        res.status(404).send(error);
+    })
+})
+
+app.put('/addworker', (req, res) => {
+    Project.findById('2')
+      .then(project => {
+          project.addWorkers(5);
+      })
+      .then(user => {
+          res.json('User added')
+      })
+      .catch(error => {
+          console.log(error)
+          res.status(404).send(error);
+      });
+});
+
 Post.belongsTo(User, {as: 'UserRef', foreignKey: 'userId'});
+Post.hasMany(Comment, {as: 'All_Comments'});
+
+User.belongsToMany(Project, {as: 'Tasks', through: 'UserProjects'});
+Project.belongsToMany(User, {as:'Workers', through: 'UserProjects'});
 
 connection
     .sync({
@@ -70,10 +127,48 @@ connection
           })
     })
     .then(() => {
+        Project.create({
+            title: 'project 1'
+        }).then(project => {
+            project.setWorkers([4, 5])
+        })
+    })
+    .then(() => {
+        Project.create({
+            title: 'project 2'
+        })
+    })
+    .then(() => {
         Post.create({
             userId: 1,
             title: 'First post',
             content: 'post content 1'
+        })
+    })
+    .then(() => {
+        Post.create({
+            userId: 1,
+            title: 'Second post',
+            content: 'post content 2'
+        })
+    })
+    .then(() => {
+        Post.create({
+            userId: 2,
+            title: 'Third post',
+            content: 'post content 3'
+        })
+    })
+    .then(() => {
+        Comment.create({
+            PostId: 1,
+            the_comment: 'comment content 1'
+        })
+    })
+    .then(() => {
+        Comment.create({
+            PostId: 1,
+            the_comment: 'comment content 2'
         })
     })
     .then(() => {

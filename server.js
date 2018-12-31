@@ -172,6 +172,13 @@ connection
         })
     })
     .then(() => {
+        Post.create({
+            UserId: 1,
+            title: 'First post',
+            content: 'post content 1'
+        })
+    })
+    .then(() => {
         console.log('Connection to database established successully.')
     })
     .error(err => {

@@ -11,10 +11,7 @@ require('./server/middleware/middleware')(app);
 require('./server/api')(app);
 
 db.sequelize.sync({
-  force: true
-})
-.then(() => {
-  seed.insert();
+  // force: true
 })
 .then(() => {
   app.listen(port, () => {

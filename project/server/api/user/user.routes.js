@@ -5,5 +5,6 @@ const router = express.Router();
 router.get('/allUsers', controller.allUsers);
 router.get('/:id', controller.singleUser);
 router.put('/saveUserFav', controller.saveUserFav);
+router.post('/addUser', controller.addUser);
 
 module.exports = router;

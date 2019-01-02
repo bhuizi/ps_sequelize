@@ -34,8 +34,8 @@ exports.singleUser = (req, res) => {
 }
 
 exports.saveUserFav = (req, res) => {
-  let title = req.body.bookTitle;
-  let UserId = req.body.userId;
+  const title = req.body.bookTitle;
+  const UserId = req.body.userId;
 
   models.Favorite.create({
     title,
@@ -50,4 +50,17 @@ exports.saveUserFav = (req, res) => {
     console.log(error);
     res.status(404).send(error);
   })
+}
+
+exports.addUser = (req, res) => {
+  const name = req.body.name
+  
+  models.User.create({name})
+    .then(user => {
+      res.json(user)
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(404).send(error);
+    })
 }

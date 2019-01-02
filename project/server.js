@@ -14,6 +14,9 @@ db.sequelize.sync({
   // force: true
 })
 .then(() => {
+  // seed.insert()
+})
+.then(() => {
   app.listen(port, () => {
     console.log('running server on port ' + port);
   })

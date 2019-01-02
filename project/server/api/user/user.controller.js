@@ -20,6 +20,8 @@ exports.singleUser = (req, res) => {
     include: [{
       model: models.Book, as: 'Reading',
       attributes: ['title', 'author']
+    }, {
+      model: models.Favorite
     }]
   })
     .then(user => {
@@ -29,4 +31,23 @@ exports.singleUser = (req, res) => {
       console.log(error);
       res.status(404).send(error);
     })
+}
+
+exports.saveUserFav = (req, res) => {
+  let title = req.body.bookTitle;
+  let UserId = req.body.userId;
+
+  models.Favorite.create({
+    title,
+    UserId
+  })
+  .then(() => {
+    res.json({
+      success: 'Success, favorite book added for User'
+    })
+  })
+  .catch(error => {
+    console.log(error);
+    res.status(404).send(error);
+  })
 }
